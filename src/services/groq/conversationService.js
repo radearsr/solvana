@@ -6,6 +6,8 @@ const client = new Groq({
   apiKey: process.env.GROQ_API_TOKEN,
 });
 
+const askToCategoriesChatHistory = [];
+
 const categoriConfig = [
   {
     name: "COMMON_CHAT",
@@ -32,27 +34,89 @@ const categoriConfig = [
   },
 ];
 
+const availableService = [
+  {
+    name: "ENABLE_USER_NON_ACTIVE",
+    description:
+      "Permintaan untuk mengaktifkan kembali pengguna yang nonaktif, dan pengguna yang pernah hapus akun",
+    apiEndpoint: "http://localhost:3000/api/v1/unitedpay/enable-user-nonactive",
+    requiredBody: {
+      kode_agen: "string",
+    },
+  },
+  {
+    name: "CREATE_SCHEDULE",
+    description: "Permintaan untuk membuat jadwal",
+    apiEndpoint: "https://api.solvana.id/create-schedule",
+    requiredBody: {
+      schedule: "string",
+      task: "string",
+    },
+  },
+  {
+    name: "COMMON_CHAT",
+    description:
+      "Percakapan biasa yang tidak memiliki arti dalam kasus yang diberikan diatas",
+    apiEndpoint: "https://api.solvana.id/common-chat",
+    requiredBody: {
+      message: "string",
+    },
+  },
+];
+
 async function askToCategories(message) {
-  const categoryListMessage = categoriConfig
+  console.log({ message });
+  const serviceListMessage = availableService
     .map(
-      (category, idx) => `${idx + 1}.${category.name}: ${category.description}`,
+      (service, idx) =>
+        `${idx + 1}.${service.name}: ${service.description}\nAPI Endpoint: ${service.apiEndpoint}\nBody: ${JSON.stringify(service.requiredBody)}`,
     )
     .join("\n");
-  const prompt = `
-  Anda adalah sistem cerdas yang akan mengklasifikasikan pesan pengguna berdasarkan kategori yang diberikan.
-  Daftar kategori:
-  ${categoryListMessage}
-  Pesan pengguna: "${message}"
-  Tentukan kategori mana pesan tersebut paling sesuai. Jika tidak jelas, pilih kategori yang paling relevan, tentukan juga kode agen dengan pola UTDxxx atau MPxxx.
-  Jawab hanya dengan nama kategori dari daftar dan kode agen, contohnya KATEGORI|UTDxxx`;
-  logger.info(JSON.stringify({ prompt }));
+  const systemPrompt = `
+  Kamu adalah solvana, asisten IT yang ramah dan profesional, dan dibawah ini adalah layanan yang bisa kamu berikan:
+  ${serviceListMessage}
+  gunakan bahasa indonesia untuk menjawab semua pertanyaan jawab dengan ramah, singkat, gunakan sedikit emoji, jawab dengan format <answer> SERVICES [<endpoint>|<body>] jika layanan disebutkan diatas, sedikit catatan <answer> tidak boleh mengandung api endpoint, body, dan nama service dan SERVICES [<endpoint>|<body>] harus berada dipaling belakang setelah <answer>
+  `;
+  if (askToCategoriesChatHistory.length === 12) {
+    askToCategoriesChatHistory.splice(0, 2);
+  }
+  askToCategoriesChatHistory.push({ role: "user", content: message });
+  console.log({
+    messages: [
+      { role: "system", content: systemPrompt },
+      ...askToCategoriesChatHistory,
+    ],
+  });
   const chatCompletion = await client.chat.completions.create({
-    messages: [{ role: "user", content: prompt }],
+    messages: [
+      { role: "system", content: systemPrompt },
+      ...askToCategoriesChatHistory,
+    ],
     model: "llama3-70b-8192",
+    temperature: 1.4,
   });
   logger.info(JSON.stringify({ chatCompletion }));
-  const resultCategory = chatCompletion.choices[0].message.content;
-  return resultCategory;
+  askToCategoriesChatHistory.push(chatCompletion.choices[0].message);
+  const resultChatCompletion = chatCompletion.choices[0].message.content;
+  if (!resultChatCompletion.includes("SERVICES")) {
+    return {
+      resultMessage: resultChatCompletion,
+      endpoint: null,
+      body: null,
+    };
+  }
+  const [resultChat] = resultChatCompletion.split("SERVICES");
+  const [endpoint, body] = resultChatCompletion
+    .split("SERVICES")[1]
+    .replace("[", "")
+    .replace("]", "")
+    .split("|");
+  logger.info(JSON.stringify({ resultChat, endpoint, body }));
+  return {
+    resultMessage: resultChat,
+    endpoint,
+    body,
+  };
 }
 
 async function askToAnalizeResponse(response) {
