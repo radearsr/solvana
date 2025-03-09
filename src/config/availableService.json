@@ -1,0 +1,43 @@
+[
+  {
+    "name": "ENABLE_USER_NON_ACTIVE",
+    "description": "Permintaan untuk mengaktifkan kembali pengguna yang nonaktif, dan pengguna yang pernah hapus akun",
+    "apiEndpoint": "http://localhost:3000/api/v1/unitedpay/enable-user-nonactive",
+    "requiredBody": {
+      "kode_agen": "string"
+    }
+  },
+  {
+    "name": "OPEN_KYC_IMAGE_UNITEDPAY",
+    "description": "Permintaan terkait verifikasi dokumen atau data (KYC) dan aset gambar yang berada dibackoffice (BO) untuk UNITEDPAY dengan kode agen awalan UTD",
+    "apiEndpoint": "http://localhost:3000/api/v1/unitedpay/upload-verification-image",
+    "requiredBody": {
+      "kode_agen": "string"
+    }
+  },
+  {
+    "name": "OPEN_KYC_IMAGE_MURAPAY",
+    "description": "Permintaan terkait verifikasi dokumen atau data (KYC) dan aset gambar yang berada dibackoffice (BO) untuk MURAPAY dengan kode agen awalan MP",
+    "apiEndpoint": "http://localhost:3000/api/v1/murapay/upload-verification-image",
+    "requiredBody": {
+      "kode_agen": "string"
+    }
+  },
+  {
+    "name": "CREATE_SCHEDULE",
+    "description": "Permintaan untuk membuat jadwal",
+    "apiEndpoint": "https://api.solvana.id/create-schedule",
+    "requiredBody": {
+      "schedule": "string",
+      "task": "string"
+    }
+  },
+  {
+    "name": "COMMON_CHAT",
+    "description": "Percakapan biasa yang tidak memiliki arti dalam kasus yang diberikan diatas",
+    "apiEndpoint": "https://api.solvana.id/common-chat",
+    "requiredBody": {
+      "message": "string"
+    }
+  }
+]

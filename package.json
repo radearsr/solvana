@@ -1,13 +1,13 @@
 {
   "name": "solvana",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "index.js",
   "engines": {
     "node": ">=18.0.0 <20.0.0"
   },
   "scripts": {
     "prepare": "npx husky",
-    "dev": "nodemon ./src/index.js",
+    "dev": "nodemon nodemon.json",
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
     "lint": "eslint \"src/**/*.{js,jsx}\""
   },

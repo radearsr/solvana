@@ -3,23 +3,11 @@ const {
   askToCategories,
   askToAnalizeResponse,
 } = require("../groq/conversationService");
-const {
-  uploadVerificationImage,
-  enableUserNonActive,
-} = require("../axios/unitedpayService");
 const { requestToSolvanaServices } = require("../axios/solvanaServices");
 const { parseCurrentContext } = require("../../utils/telegrafUtils");
 
-const categoryHandler = {
-  ENABLE_USER_NON_ACTIVE: async (title, agenCode) =>
-    enableUserNonActive(title, agenCode),
-  OPEN_KYC_IMAGE: async (title, agenCode) =>
-    uploadVerificationImage(title, agenCode),
-  COMMON_CHAT: "Action Null",
-};
-
 const chatMessageTitleMap = {
-  "Testing Send BOT NodeJS 2": "UNITEDPAY",
+  "Testing Send BOT NodeJS 2": "MURAPAY",
   "IT-CS UNITEDPAY": "UNITEDPAY",
   "IT-CS MURAPAY": "MURAPAY",
 };
@@ -51,7 +39,7 @@ async function handleMessageGeneralTask(ctx, textMessage) {
     const response = await requestToSolvanaServices(endpoint, body);
     console.log({ response });
     const resultAnalize =
-      await askToCategories(`Permintaan dari: ${fullname}, Service yang dijalankan yaitu hit api ${endpoint}, coba simpulkan hasil dari response API ini
+      await askToCategories(`Permintaan dari: ${fullname}, Service yang dijalankan yaitu hit api ${endpoint}, coba simpulkan hasil dari response API ini jika ada kendala coba CC tag @radea_surya
     ${JSON.stringify(response)}| tidak usah jawab dengan format`);
     ctx.reply(resultAnalize.resultMessage, {
       reply_to_message_id: ctx.message.message_id,
