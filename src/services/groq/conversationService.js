@@ -7,6 +7,14 @@ const client = new Groq({
   apiKey: process.env.GROQ_API_TOKEN,
 });
 
+async function clearNoiseToParseJson(resultMessage) {
+  const resultJson = resultMessage.split("```")[1];
+  const removedNoise = resultJson.replace("json", "");
+  const clearJson = removedNoise.replace(/(\r\n|\n|\r)/gm, "");
+  const resultJsonParsed = JSON.parse(clearJson);
+  return resultJsonParsed;
+}
+
 async function askToCategories(message) {
   const askToCategoriesChatHistory = fileUtils.readJsonFile(
     "./src/config/askToCategoriesChatHistory.json",
@@ -15,22 +23,12 @@ async function askToCategories(message) {
     "./src/config/availableService.json",
   );
   const serviceListMessage = availableService
-    .map(
-      (service, idx) =>
-        `${idx + 1}.${service.name}: ${service.description}\nAPI Endpoint: ${service.apiEndpoint}\nBody: ${JSON.stringify(service.requiredBody)}`,
-    )
+    .map((service, idx) => `${idx + 1}.${service.name}: ${service.description}`)
     .join("\n");
   const systemPrompt = `
   Kamu adalah solvana, asisten IT yang ramah dan profesional, dan dibawah ini adalah layanan yang bisa kamu berikan:
   ${serviceListMessage}
-  Petunjuk:  
-  - Gunakan bahasa Indonesia dengan nada ramah, singkat, dan sisipkan sedikit emoji.  
-  - Jika terdapat layanan yang relevan (permintaan layanan terkait), sertakan informasi layanan pada output dengan format:  
-    '<answer> SERVICES [<endpoint>|<body>]'
-  - Pada bagian '<answer>', jangan menyertakan nama layanan, API endpoint, ataupun body.
-  - emoji yang digunakan harus relevan dengan jawaban yang diberikan.
-  - jangan berikan emoji dibagian endpoint dan body. 
-  - Jika tidak ada layanan terkait, output tidak wajib menggunakan format tersebut.
+  jawab menggunakan bahasa indonesia dengan ramah, tambahkan sedikit emoji(jangan gunakan diakhir jawaban), dan dengan format <jawaban> SERVICES <nama layanan> jika kamu bisa bantu
   `;
   if (askToCategoriesChatHistory.length === 12) {
     askToCategoriesChatHistory.splice(0, 2);
@@ -48,7 +46,7 @@ async function askToCategories(message) {
       ...askToCategoriesChatHistory,
     ],
     model: "llama3-70b-8192",
-    temperature: 1.4,
+    temperature: 1,
   });
   logger.info(JSON.stringify({ chatCompletion }));
   askToCategoriesChatHistory.push(chatCompletion.choices[0].message);
@@ -58,25 +56,46 @@ async function askToCategories(message) {
       resultMessage: resultChatCompletion,
       endpoint: null,
       body: null,
+      description: null,
     };
   }
   fileUtils.writeJsonFile(
     "./src/config/askToCategoriesChatHistory.json",
     askToCategoriesChatHistory,
   );
-  const [resultChat] = resultChatCompletion.split("SERVICES");
-  const [endpoint, body] = resultChatCompletion
-    .split("SERVICES")[1]
-    .replace("[", "")
-    .replace("]", "")
-    .split("|");
-  console.log({ resultChat, endpoint, body });
-  logger.info(JSON.stringify({ resultChat, endpoint, body }));
+  const categoryName = resultChatCompletion.split("SERVICES")[1];
+  const matchedService = availableService.find((service) =>
+    categoryName.includes(service.name),
+  );
   return {
-    resultMessage: resultChat,
-    endpoint,
-    body,
+    resultMessage: resultChatCompletion,
+    categoryName,
+    body: matchedService.requiredBody,
+    endpoint: matchedService.apiEndpoint,
+    description: matchedService.description,
   };
+}
+
+async function askToGenerateJson(message, jsonExpectation, description) {
+  console.log({ message, jsonExpectation, description });
+  const chatCompletion = await client.chat.completions.create({
+    messages: [
+      {
+        role: "user",
+        content: `
+        dari pesan dibawah ini,
+        ${message}
+        bantu buatkan json datanya, jawab hanya dengan format json saja, tidak usah memberikan penjelasan apapun, ini untuk struktur jsonnya, dan ini adalah informasi tambahan ${description}
+        ${JSON.stringify(jsonExpectation)}
+        `,
+      },
+    ],
+    model: "deepseek-r1-distill-qwen-32b",
+    temperature: 0.8,
+  });
+  logger.info(JSON.stringify({ chatCompletion }));
+  const resultChatCompletion = chatCompletion.choices[0].message.content;
+  return clearNoiseToParseJson(resultChatCompletion);
 }
 
 async function askToAnalizeResponse(response) {
@@ -101,4 +120,4 @@ async function askToAnalizeResponse(response) {
   return resultAnalize;
 }
 
-module.exports = { askToCategories, askToAnalizeResponse };
+module.exports = { askToCategories, askToAnalizeResponse, askToGenerateJson };

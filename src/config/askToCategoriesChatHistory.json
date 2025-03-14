@@ -1,26 +1,10 @@
 [
   {
     "role": "user",
-    "content": "Dari Radea Surya Ramandhita, Group: MURAPAY, Pesan: MP0000002  Radan\n\nkak minta tolong dibantu buka data verif member ini ya \n@Barianbarbot"
+    "content": "Dari Radea Surya Ramandhita, Group: undefined, Pesan: bagaimana cara mengatasi tukar poin sukses tetapi saldo belum masuk"
   },
   {
     "role": "assistant",
-    "content": " halo Radea! 😊 OPEN_KYC_IMAGE_MURAPAY SERVICES [http://localhost:3000/api/v1/murapay/upload-verification-image|{\"kode_agen\":\"string\"}]"
-  },
-  {
-    "role": "user",
-    "content": "Dari Radea Surya Ramandhita, Group: MURAPAY, Pesan: Selamat sore team, Bantuanya untuk pembuatan Voucher dengan detail sebagai berikut : \n\nE-Voucher Maari Madukoro Nilai voucher Rp.50.000 : \n1. VMAARIMADREQJ05\n2. VMAARIMADREQJ06\n3. VMAARIMADREQJ07\n4. VMAARIMADREQJ08\n\nTanggal Berlaku : 03 Maret 2025 - 30 April 2025 \nTidak ada syarat penukaran. \n\nBantuanya ya team untuk pengaktifan malam ini \n\n@Barianbarbot"
-  },
-  {
-    "role": "assistant",
-    "content": "Selamat sore Radea! 😊 CREATE_VOUCHER_MAARI SERVICES [http://localhost:3000/api/v1/maari/create-voucher|{\"place\":\"string\",\"vouchers\":[{\"name\":\"VMAARIMADREQJ05\",\"minSales\":0,\"discountNominal\":50000},{\"name\":\"VMAARIMADREQJ06\",\"minSales\":0,\"discountNominal\":50000},{\"name\":\"VMAARIMADREQJ07\",\"minSales\":0,\"discountNominal\":50000},{\"name\":\"VMAARIMADREQJ08\",\"minSales\":0,\"discountNominal\":50000}]}]"
-  },
-  {
-    "role": "user",
-    "content": "Dari Radea Surya Ramandhita, Group: MURAPAY, Pesan: Selamat sore team, Bantuanya untuk pembuatan Voucher dengan detail sebagai berikut : \n\nE-Voucher Maari Madukoro Nilai voucher Rp.50.000 : \n1. VMAARIMADREQJ05\n2. VMAARIMADREQJ06\n3. VMAARIMADREQJ07\n4. VMAARIMADREQJ08\n\nTanggal Berlaku : 03 Maret 2025 - 30 April 2025 \nTidak ada syarat penukaran. \n\nBantuanya ya team untuk pengaktifan malam ini \n\n@Barianbarbot"
-  },
-  {
-    "role": "assistant",
-    "content": "Selamat sore Radea! 😊 CREATE_VOUCHER_MAARI SERVICES [http://localhost:3000/api/v1/maari/create-voucher|{\"cabang\":\"Madukoro\",\"vouchers\":[{\"kode\":\"VMAARIMADREQJ05\",\"minimalSales\":0,\"discountNominal\":50000},{\"kode\":\"VMAARIMADREQJ06\",\"minimalSales\":0,\"discountNominal\":50000},{\"kode\":\"VMAARIMADREQJ07\",\"minimalSales\":0,\"discountNominal\":50000},{\"kode\":\"VMAARIMADREQJ08\",\"minimalSales\":0,\"discountNominal\":50000}],\"startDate\":\"03-03-2025\",\"endDate\":\"30-04-2025\"}]"
+    "content": "Halo Radea Surya Ramandhita 👋, terima kasih telah menghubungi kami. Saat ini, kita perlu melakukan pengecekan lebih lanjut terkait masalah tersebut. SERVICES ENABLE_USER_NON_ACTIVE. Saya akan membantu mengaktifkan kembali akun Anda untuk memastikan saldo Anda dapat diperbarui. Mohon tunggu sebentar, saya akan segera melakukan proses ini. 😊"
   }
 ]
