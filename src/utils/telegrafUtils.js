@@ -1,6 +1,7 @@
 const logger = require("./winstonUtils");
 
 exports.parseCurrentContext = (ctx, textMessage) => {
+  logger.warn(JSON.stringify(ctx));
   const isReply = ctx.message.hasOwnProperty("reply_to_message");
   const replyMessage = isReply ? ctx.message.reply_to_message.text : "";
   const replyFullname = isReply

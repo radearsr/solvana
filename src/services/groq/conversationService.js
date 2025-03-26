@@ -34,12 +34,6 @@ async function askToCategories(message) {
     askToCategoriesChatHistory.splice(0, 2);
   }
   askToCategoriesChatHistory.push({ role: "user", content: message });
-  console.log({
-    messages: [
-      { role: "system", content: systemPrompt },
-      ...askToCategoriesChatHistory,
-    ],
-  });
   const chatCompletion = await client.chat.completions.create({
     messages: [
       { role: "system", content: systemPrompt },
@@ -48,12 +42,12 @@ async function askToCategories(message) {
     model: "llama3-70b-8192",
     temperature: 1,
   });
-  logger.info(JSON.stringify({ chatCompletion }));
   askToCategoriesChatHistory.push(chatCompletion.choices[0].message);
   const resultChatCompletion = chatCompletion.choices[0].message.content;
   if (!resultChatCompletion.includes("SERVICES")) {
     return {
       resultMessage: resultChatCompletion,
+      categoryName: null,
       endpoint: null,
       body: null,
       description: null,
@@ -77,7 +71,6 @@ async function askToCategories(message) {
 }
 
 async function askToGenerateJson(message, jsonExpectation, description) {
-  console.log({ message, jsonExpectation, description });
   const chatCompletion = await client.chat.completions.create({
     messages: [
       {
@@ -93,31 +86,9 @@ async function askToGenerateJson(message, jsonExpectation, description) {
     model: "deepseek-r1-distill-qwen-32b",
     temperature: 0.8,
   });
-  logger.info(JSON.stringify({ chatCompletion }));
   const resultChatCompletion = chatCompletion.choices[0].message.content;
+  logger.info(JSON.stringify({ resultChatCompletion }));
   return clearNoiseToParseJson(resultChatCompletion);
 }
 
-async function askToAnalizeResponse(response) {
-  const prompt = `analisa response dibawah ini, dan berikan penjelasan yang singkat, ramah, gunakan emoji untuk menggambarkan penjelasan kamu, untuk menjawab maksimal 50 kata.\n${JSON.stringify(
-    response,
-  )}`;
-  logger.info(JSON.stringify({ prompt }));
-  const chatCompletion = await client.chat.completions.create({
-    temperature: 1.2,
-    messages: [
-      {
-        role: "system",
-        content:
-          "Solvana, kamu adalah asisten IT yang ramah dan profesional. yang akan menganalisa kendala yang terjadi, kamu berasal dari indonesia, jadi gunakan bahasa indonesia untuk menjawab semua pertanyaan",
-      },
-      { role: "user", content: prompt },
-    ],
-    model: "llama-3.3-70b-versatile",
-  });
-  logger.info(JSON.stringify({ chatCompletion }));
-  const resultAnalize = chatCompletion.choices[0].message.content;
-  return resultAnalize;
-}
-
-module.exports = { askToCategories, askToAnalizeResponse, askToGenerateJson };
+module.exports = { askToCategories, askToGenerateJson };

@@ -1,12 +1,10 @@
 const logger = require("../../utils/winstonUtils");
 const {
   askToCategories,
-  askToAnalizeResponse,
   askToGenerateJson,
 } = require("../groq/conversationService");
 const { requestToSolvanaServices } = require("../axios/solvanaServices");
 const { parseCurrentContext } = require("../../utils/telegrafUtils");
-const { query } = require("winston");
 
 const chatMessageTitleMap = {
   "Testing Send BOT NodeJS 2": "MURAPAY",
@@ -25,17 +23,13 @@ async function handleMessageGeneralTask(ctx, textMessage) {
       logger.warn("Chat is not private and bot is not summoned");
       return;
     }
-    const chatGroup = chatMessageTitleMap[chatTitle];
+    const chatGroup = chatMessageTitleMap[chatTitle]
+      ? chatMessageTitleMap[chatTitle]
+      : "Private Chat";
     const resultCategory = await askToCategories(
       `Dari ${fullname}, Group: ${chatGroup}, Pesan: ${message}`,
     );
-    console.log({ resultCategory });
-    logger.warn(JSON.stringify(JSON.stringify({ resultCategory })));
-    if (!resultCategory.endpoint) {
-      return ctx.reply(resultCategory.resultMessage, {
-        reply_to_message_id: ctx.message.message_id,
-      });
-    }
+    logger.warn(JSON.stringify({ resultCategory }));
     ctx.reply(resultCategory.resultMessage, {
       reply_to_message_id: ctx.message.message_id,
     });
@@ -56,7 +50,6 @@ async function handleMessageGeneralTask(ctx, textMessage) {
       resultCategory.body,
       resultCategory.description,
     );
-    console.log({ bodyJson });
     const response = await requestToSolvanaServices(
       resultCategory.endpoint,
       bodyJson,

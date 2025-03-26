@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "Solvana",
       script: "./src/index.js",
-      watch: true,
+      watch: false,
       env: {
         NODE_ENV: "production",
       },
