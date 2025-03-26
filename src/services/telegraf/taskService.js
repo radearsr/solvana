@@ -1,59 +1,67 @@
 const logger = require("../../utils/winstonUtils");
 const {
   askToCategories,
-  askToAnalizeResponse,
+  askToGenerateJson,
 } = require("../groq/conversationService");
-const {
-  uploadVerificationImage,
-  enableUserNonActive,
-} = require("../axios/unitedpayService");
-
-const categoryHandler = {
-  ENABLE_USER_NON_ACTIVE: async (title, agenCode) =>
-    enableUserNonActive(title, agenCode),
-  OPEN_KYC_IMAGE: async (title, agenCode) =>
-    uploadVerificationImage(title, agenCode),
-  COMMON_CHAT: "Action Null",
-};
+const { requestToSolvanaServices } = require("../axios/solvanaServices");
+const { parseCurrentContext } = require("../../utils/telegrafUtils");
 
 const chatMessageTitleMap = {
-  "Testing Send BOT NodeJS 2": "UNITEDPAY",
+  "Testing Send BOT NodeJS 2": "MURAPAY",
   "IT-CS UNITEDPAY": "UNITEDPAY",
   "IT-CS MURAPAY": "MURAPAY",
 };
 
 async function handleMessageGeneralTask(ctx, textMessage) {
   try {
-    const botUsername = ctx.botInfo.username;
-    const chatType = ctx.chat.type;
-    const fullname = ctx.from.first_name + " " + ctx.from.last_name;
-    const chatTitle = ctx.message.chat.title || "PRIVATE";
-    logger.info(
-      JSON.stringify({
-        botUsername,
-        chatType,
-        fullname,
-        textMessage,
-        chatTitle,
-      }),
-    );
+    await ctx.sendChatAction("typing");
+    const { botUsername, chatType, fullname, message, chatTitle } =
+      parseCurrentContext(ctx, textMessage);
     const isPrivateChat = chatType === "private";
     const isBotSummoned = textMessage.includes(botUsername);
     if (!isPrivateChat && !isBotSummoned) {
       logger.warn("Chat is not private and bot is not summoned");
       return;
     }
-    const resultCategory = await askToCategories(textMessage);
-    logger.warn(JSON.stringify(JSON.stringify({ resultCategory })));
-    const [category, agenCode] = resultCategory.split("|");
-    const handler = categoryHandler[category];
-    const titleHandler = chatMessageTitleMap[chatTitle];
-    const responseHandler = await handler(titleHandler, agenCode);
-    const resultAnalize = await askToAnalizeResponse(responseHandler);
-    ctx.reply(resultAnalize, {
+    const chatGroup = chatMessageTitleMap[chatTitle]
+      ? chatMessageTitleMap[chatTitle]
+      : "Private Chat";
+    const resultCategory = await askToCategories(
+      `Dari ${fullname}, Group: ${chatGroup}, Pesan: ${message}`,
+    );
+    logger.warn(JSON.stringify({ resultCategory }));
+    ctx.reply(resultCategory.resultMessage, {
+      reply_to_message_id: ctx.message.message_id,
+    });
+    await ctx.sendChatAction("typing");
+    if (resultCategory.categoryName.includes("COMMON_CHAT")) {
+      const responseRag = await requestToSolvanaServices(
+        resultCategory.endpoint,
+        {
+          query: message,
+        },
+      );
+      return ctx.reply(responseRag.answer, {
+        reply_to_message_id: ctx.message.message_id,
+      });
+    }
+    const bodyJson = await askToGenerateJson(
+      message,
+      resultCategory.body,
+      resultCategory.description,
+    );
+    const response = await requestToSolvanaServices(
+      resultCategory.endpoint,
+      bodyJson,
+    );
+    const resultAnalize =
+      await askToCategories(`Permintaan dari: ${fullname}, Service yang dijalankan yaitu hit api ${resultCategory.endpoint}, coba simpulkan hasil dari response API ini jika ada kendala coba CC tag @radea_surya
+    ${JSON.stringify(response)}| tidak usah jawab dengan format`);
+    ctx.reply(resultAnalize.resultMessage, {
       reply_to_message_id: ctx.message.message_id,
     });
   } catch (error) {
+    console.log(error);
     logger.error(JSON.stringify({ error }));
   }
 }

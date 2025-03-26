@@ -1,80 +1,94 @@
 require("dotenv").config();
 const { Groq } = require("groq-sdk");
 const logger = require("../../utils/winstonUtils");
+const fileUtils = require("../../utils/fileUtils");
 
 const client = new Groq({
   apiKey: process.env.GROQ_API_TOKEN,
 });
 
-const categoriConfig = [
-  {
-    name: "COMMON_CHAT",
-    description:
-      "Percakapan biasa yang tidak memiliki arti dalam kasus yang diberikan diatas",
-    responseTemplate: `Pesan: {{message}} \nBalasan: Terima kasih telah menghubungi kami. Apakah ada yang bisa kami bantu?`,
-  },
-  {
-    name: "API_TRX_ERROR",
-    description: "Masalah terkait error dalam proses transaksi API",
-    responseTemplate: `Pesan: {{message}} \nBalasan: Terdapat masalah pada transaksi API. Mohon pastikan koneksi Anda stabil dan coba lagi. Jika masalah berlanjut, hubungi tim pengembangan.`,
-  },
-  {
-    name: "OPEN_KYC_IMAGE",
-    description:
-      "Permintaan terkait verifikasi dokumen atau data (KYC) dan aset gambar yang berada dibackoffice (BO)",
-    responseTemplate: `Pesan: "{{message}}" \nBalasan: "Dokumen sedang dalam proses penanganan. Harap tunggu sebentar\ncc @radea_surya"`,
-  },
-  {
-    name: "ENABLE_USER_NON_ACTIVE",
-    description:
-      "Permintaan untuk mengaktifkan kembali pengguna yang nonaktif, dan pengguna yang pernah hapus akun",
-    responseTemplate: `Pesan: "{{message}}" \nBalasan: "Akun akan segera diaktifkan kembali. Mohon tunggu beberapa saat untuk proses lebih lanjut".`,
-  },
-];
+async function clearNoiseToParseJson(resultMessage) {
+  const resultJson = resultMessage.split("```")[1];
+  const removedNoise = resultJson.replace("json", "");
+  const clearJson = removedNoise.replace(/(\r\n|\n|\r)/gm, "");
+  const resultJsonParsed = JSON.parse(clearJson);
+  return resultJsonParsed;
+}
 
 async function askToCategories(message) {
-  const categoryListMessage = categoriConfig
-    .map(
-      (category, idx) => `${idx + 1}.${category.name}: ${category.description}`,
-    )
+  const askToCategoriesChatHistory = fileUtils.readJsonFile(
+    "./src/config/askToCategoriesChatHistory.json",
+  );
+  const availableService = fileUtils.readJsonFile(
+    "./src/config/availableService.json",
+  );
+  const serviceListMessage = availableService
+    .map((service, idx) => `${idx + 1}.${service.name}: ${service.description}`)
     .join("\n");
-  const prompt = `
-  Anda adalah sistem cerdas yang akan mengklasifikasikan pesan pengguna berdasarkan kategori yang diberikan.
-  Daftar kategori:
-  ${categoryListMessage}
-  Pesan pengguna: "${message}"
-  Tentukan kategori mana pesan tersebut paling sesuai. Jika tidak jelas, pilih kategori yang paling relevan, tentukan juga kode agen dengan pola UTDxxx atau MPxxx.
-  Jawab hanya dengan nama kategori dari daftar dan kode agen, contohnya KATEGORI|UTDxxx`;
-  logger.info(JSON.stringify({ prompt }));
+  const systemPrompt = `
+  Kamu adalah solvana, asisten IT yang ramah dan profesional, dan dibawah ini adalah layanan yang bisa kamu berikan:
+  ${serviceListMessage}
+  jawab menggunakan bahasa indonesia dengan ramah, tambahkan sedikit emoji(jangan gunakan diakhir jawaban), dan dengan format <jawaban> SERVICES <nama layanan> jika kamu bisa bantu
+  `;
+  if (askToCategoriesChatHistory.length === 12) {
+    askToCategoriesChatHistory.splice(0, 2);
+  }
+  askToCategoriesChatHistory.push({ role: "user", content: message });
   const chatCompletion = await client.chat.completions.create({
-    messages: [{ role: "user", content: prompt }],
+    messages: [
+      { role: "system", content: systemPrompt },
+      ...askToCategoriesChatHistory,
+    ],
     model: "llama3-70b-8192",
+    temperature: 1,
   });
-  logger.info(JSON.stringify({ chatCompletion }));
-  const resultCategory = chatCompletion.choices[0].message.content;
-  return resultCategory;
+  askToCategoriesChatHistory.push(chatCompletion.choices[0].message);
+  const resultChatCompletion = chatCompletion.choices[0].message.content;
+  if (!resultChatCompletion.includes("SERVICES")) {
+    return {
+      resultMessage: resultChatCompletion,
+      categoryName: null,
+      endpoint: null,
+      body: null,
+      description: null,
+    };
+  }
+  fileUtils.writeJsonFile(
+    "./src/config/askToCategoriesChatHistory.json",
+    askToCategoriesChatHistory,
+  );
+  const categoryName = resultChatCompletion.split("SERVICES")[1];
+  const matchedService = availableService.find((service) =>
+    categoryName.includes(service.name),
+  );
+  return {
+    resultMessage: resultChatCompletion,
+    categoryName,
+    body: matchedService.requiredBody,
+    endpoint: matchedService.apiEndpoint,
+    description: matchedService.description,
+  };
 }
 
-async function askToAnalizeResponse(response) {
-  const prompt = `analisa response dibawah ini, dan berikan penjelasan yang singkat, ramah, gunakan emoji untuk menggambarkan penjelasan kamu, untuk menjawab maksimal 50 kata.\n${JSON.stringify(
-    response,
-  )}`;
-  logger.info(JSON.stringify({ prompt }));
+async function askToGenerateJson(message, jsonExpectation, description) {
   const chatCompletion = await client.chat.completions.create({
-    temperature: 1.2,
     messages: [
       {
-        role: "system",
-        content:
-          "Solvana, kamu adalah asisten IT yang ramah dan profesional. yang akan menganalisa kendala yang terjadi, kamu berasal dari indonesia, jadi gunakan bahasa indonesia untuk menjawab semua pertanyaan",
+        role: "user",
+        content: `
+        dari pesan dibawah ini,
+        ${message}
+        bantu buatkan json datanya, jawab hanya dengan format json saja, tidak usah memberikan penjelasan apapun, ini untuk struktur jsonnya, dan ini adalah informasi tambahan ${description}
+        ${JSON.stringify(jsonExpectation)}
+        `,
       },
-      { role: "user", content: prompt },
     ],
-    model: "llama-3.3-70b-versatile",
+    model: "deepseek-r1-distill-qwen-32b",
+    temperature: 0.8,
   });
-  logger.info(JSON.stringify({ chatCompletion }));
-  const resultAnalize = chatCompletion.choices[0].message.content;
-  return resultAnalize;
+  const resultChatCompletion = chatCompletion.choices[0].message.content;
+  logger.info(JSON.stringify({ resultChatCompletion }));
+  return clearNoiseToParseJson(resultChatCompletion);
 }
 
-module.exports = { askToCategories, askToAnalizeResponse };
+module.exports = { askToCategories, askToGenerateJson };

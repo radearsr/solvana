@@ -5,7 +5,7 @@ const logDir = path.join(__dirname, "../logs");
 require("fs").existsSync(logDir) || require("fs").mkdirSync(logDir);
 
 const logger = winston.createLogger({
-  level: "info",
+  level: "warn",
   format: winston.format.combine(
     winston.format.timestamp({
       format: "YYYY-MM-DD HH:mm:ss",

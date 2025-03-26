@@ -17,4 +17,23 @@ function getFullPathFilesInDirectory(directoryPath) {
   }
 }
 
-module.exports = { getFullPathFilesInDirectory };
+function readJsonFile(filePath) {
+  try {
+    const fileContent = fs.readFileSync(filePath, "utf8");
+    return JSON.parse(fileContent || "[]");
+  } catch (error) {
+    console.error("Error reading file:", error);
+    return [];
+  }
+}
+
+function writeJsonFile(filePath, data) {
+  try {
+    const jsonData = JSON.stringify(data, null, 2);
+    fs.writeFileSync(filePath, jsonData);
+  } catch (error) {
+    console.error("Error writing file:", error);
+  }
+}
+
+module.exports = { getFullPathFilesInDirectory, readJsonFile, writeJsonFile };
