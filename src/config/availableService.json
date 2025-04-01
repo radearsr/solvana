@@ -16,17 +16,18 @@
     }
   },
   {
-    "name": "CREATE_VOUCHER_MAARI",
-    "description": "Permintaan untuk membuat voucher di MAARI dengan cabang (Madukoro/Ventura)",
-    "apiEndpoint": "http://192.168.1.210:3000/api/v1/esb/voucher/excel",
+    "name": "CREATE_VOUCHER",
+    "description": "Permintaan untuk membuat voucher di MAARI atau BURJO",
+    "apiEndpoint": "http://localhost:3000/api/v1/esb/voucher/excel",
     "requiredBody": {
       "vouchersConfig": [
         {
-          "cabang": "string",
+          "cabang": "nama cabang",
+          "kodeCabang": "BRJO untuk burjo, MAARI untuk maari (pilih 1 saja)",
           "detailsVouchers": [
             {
               "voucherCode": "string",
-              "voucherLengthDays": "string (hari berlaku voucher, isi 1 jika tidak ada perintah)",
+              "voucherLengthDays": "string(kalkulasi dari masa berlaku)",
               "minSalesAmount": "string(isi 0 jika tidak ada perintah)",
               "amount": "string",
               "notes": "string (kesimpulan dari perintah untuk apa voucher ini atau isi dengan nominal dan cabang mana)",

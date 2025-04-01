@@ -83,8 +83,8 @@ async function askToGenerateJson(message, jsonExpectation, description) {
         `,
       },
     ],
-    model: "deepseek-r1-distill-qwen-32b",
-    temperature: 0.8,
+    model: "llama-3.3-70b-versatile",
+    temperature: 1,
   });
   const resultChatCompletion = chatCompletion.choices[0].message.content;
   logger.info(JSON.stringify({ resultChatCompletion }));

@@ -14,7 +14,6 @@ const chatMessageTitleMap = {
 
 async function handleMessageGeneralTask(ctx, textMessage) {
   try {
-    await ctx.sendChatAction("typing");
     const { botUsername, chatType, fullname, message, chatTitle } =
       parseCurrentContext(ctx, textMessage);
     const isPrivateChat = chatType === "private";
@@ -23,6 +22,7 @@ async function handleMessageGeneralTask(ctx, textMessage) {
       logger.warn("Chat is not private and bot is not summoned");
       return;
     }
+    await ctx.sendChatAction("typing");
     const chatGroup = chatMessageTitleMap[chatTitle]
       ? chatMessageTitleMap[chatTitle]
       : "Private Chat";
