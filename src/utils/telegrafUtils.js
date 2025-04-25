@@ -21,7 +21,7 @@ exports.parseCurrentContext = (ctx, textMessage) => {
       chatType,
       fullname,
       isReply,
-      replyMessage,
+      message,
       chatTitle,
       replyFullname,
     }),
@@ -36,4 +36,15 @@ exports.parseCurrentContext = (ctx, textMessage) => {
     replyFullname,
     message,
   };
+};
+
+exports.matchesChatTitle = (chatTitle) => {
+  const chatMessageTitleMap = {
+    "Testing Send BOT NodeJS 2": "UNITEDPAY",
+    "IT-CS UNITEDPAY": "UNITEDPAY",
+    "IT-CS MURAPAY": "MURAPAY",
+  };
+  return chatMessageTitleMap[chatTitle]
+    ? chatMessageTitleMap[chatTitle]
+    : "Private Chat";
 };

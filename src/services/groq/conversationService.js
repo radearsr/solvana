@@ -8,9 +8,13 @@ const client = new Groq({
 });
 
 async function clearNoiseToParseJson(resultMessage) {
-  const resultJson = resultMessage.split("```")[1];
-  const removedNoise = resultJson.replace("json", "");
+  logger.debug(JSON.stringify({ defaultResponseJson: resultMessage }));
+  if (!resultMessage.includes("```")) {
+    return JSON.parse(resultMessage);
+  }
+  const removedNoise = resultMessage.replace("json", "").replace(/```/g, "");
   const clearJson = removedNoise.replace(/(\r\n|\n|\r)/gm, "");
+  logger.debug(JSON.stringify({ clearJson }));
   const resultJsonParsed = JSON.parse(clearJson);
   return resultJsonParsed;
 }
@@ -61,16 +65,19 @@ async function askToCategories(message) {
   const matchedService = availableService.find((service) =>
     categoryName.includes(service.name),
   );
+  logger.warn(JSON.stringify({ matchedService }));
   return {
     resultMessage: resultChatCompletion,
     categoryName,
     body: matchedService.requiredBody,
     endpoint: matchedService.apiEndpoint,
     description: matchedService.description,
+    responseType: matchedService.responseType,
   };
 }
 
 async function askToGenerateJson(message, jsonExpectation, description) {
+  logger.info(JSON.stringify({ message, jsonExpectation, description }));
   const chatCompletion = await client.chat.completions.create({
     messages: [
       {

@@ -2,18 +2,20 @@
   {
     "name": "ENABLE_USER_NON_ACTIVE",
     "description": "Permintaan untuk mengaktifkan kembali pengguna yang nonaktif, dan pengguna yang pernah hapus akun",
-    "apiEndpoint": "http://192.168.1.210:3000/api/v1/unitedpay/enable-user-nonactive",
+    "apiEndpoint": "http://localhost:3000/api/v1/unitedpay/enable-user-nonactive",
     "requiredBody": {
       "kode_agen": "string"
-    }
+    },
+    "responseType": "text"
   },
   {
     "name": "OPEN_KYC_IMAGE_UNITEDPAY",
     "description": "Permintaan terkait verifikasi dokumen atau data (KYC) dan aset gambar yang berada dibackoffice (BO) untuk UNITEDPAY dengan kode agen awalan UTD",
-    "apiEndpoint": "http://192.168.1.210:3000/api/v1/unitedpay/upload-verification-image",
+    "apiEndpoint": "http://localhost:3000/api/v1/unitedpay/upload-verification-image",
     "requiredBody": {
       "kode_agen": "string"
-    }
+    },
+    "responseType": "text"
   },
   {
     "name": "CREATE_VOUCHER",
@@ -37,15 +39,17 @@
           ]
         }
       ]
-    }
+    },
+    "responseType": "file"
   },
   {
     "name": "OPEN_KYC_IMAGE_MURAPAY",
     "description": "Permintaan terkait verifikasi dokumen atau data (KYC) dan aset gambar yang berada dibackoffice (BO) untuk MURAPAY dengan kode agen awalan MP",
-    "apiEndpoint": "http://192.168.1.210:3000/api/v1/murapay/upload-verification-image",
+    "apiEndpoint": "http://localhost:3000/api/v1/murapay/upload-verification-image",
     "requiredBody": {
       "kode_agen": "string"
-    }
+    },
+    "responseType": "text"
   },
   {
     "name": "COMMON_CHAT",
@@ -53,6 +57,7 @@
     "apiEndpoint": "http://192.168.0.9:5000/ask",
     "requiredBody": {
       "query": "string"
-    }
+    },
+    "responseType": "text"
   }
 ]

@@ -3,14 +3,41 @@ const {
   askToCategories,
   askToGenerateJson,
 } = require("../groq/conversationService");
-const { requestToSolvanaServices } = require("../axios/solvanaServices");
-const { parseCurrentContext } = require("../../utils/telegrafUtils");
+const {
+  solvanaService,
+  requestDownloadFile,
+} = require("../axios/solvanaServices");
+const {
+  parseCurrentContext,
+  matchesChatTitle,
+} = require("../../utils/telegrafUtils");
+const fileUtils = require("../../utils/fileUtils");
 
 const chatMessageTitleMap = {
-  "Testing Send BOT NodeJS 2": "MURAPAY",
+  "Testing Send BOT NodeJS 2": "UNITEDPAY",
   "IT-CS UNITEDPAY": "UNITEDPAY",
   "IT-CS MURAPAY": "MURAPAY",
 };
+
+async function handleSendFileFromResponse(files, ctx) {
+  files.forEach((groupVouchers) => {
+    groupVouchers.files.forEach(async (voucher) => {
+      const downloadedFile = await requestDownloadFile(voucher);
+      const fileDetail = fileUtils.getDetailsFromFile(voucher, downloadedFile);
+      await ctx.replyWithDocument(
+        {
+          source: fileDetail.source,
+          filename: fileDetail.filename,
+        },
+        {
+          caption: `File Voucher ${fileDetail.filename}`,
+          reply_to_message_id: ctx.message.message_id,
+        },
+      );
+      fileUtils.deleteFile(downloadedFile);
+    });
+  });
+}
 
 async function handleMessageGeneralTask(ctx, textMessage) {
   try {
@@ -23,46 +50,40 @@ async function handleMessageGeneralTask(ctx, textMessage) {
       return;
     }
     await ctx.sendChatAction("typing");
-    const chatGroup = chatMessageTitleMap[chatTitle]
-      ? chatMessageTitleMap[chatTitle]
-      : "Private Chat";
-    const resultCategory = await askToCategories(
-      `Dari ${fullname}, Group: ${chatGroup}, Pesan: ${message}`,
-    );
-    logger.warn(JSON.stringify({ resultCategory }));
-    ctx.reply(resultCategory.resultMessage, {
+    const chatGroup = matchesChatTitle(chatTitle);
+    return ctx.reply("PASS");
+    const askTemplate = `Dari ${fullname}, Group: ${chatGroup}, Pesan: ${message}`;
+    const category = await askToCategories(askTemplate);
+    logger.warn(JSON.stringify({ category }));
+    ctx.reply(category.resultMessage, {
       reply_to_message_id: ctx.message.message_id,
     });
     await ctx.sendChatAction("typing");
-    if (resultCategory.categoryName.includes("COMMON_CHAT")) {
-      const responseRag = await requestToSolvanaServices(
-        resultCategory.endpoint,
-        {
-          query: message,
-        },
-      );
+    if (category.categoryName.includes("COMMON_CHAT")) {
+      const responseRag = await solvanaService(category.endpoint, {
+        query: message,
+      });
       return ctx.reply(responseRag.answer, {
         reply_to_message_id: ctx.message.message_id,
       });
     }
     const bodyJson = await askToGenerateJson(
       message,
-      resultCategory.body,
-      resultCategory.description,
+      category.body,
+      category.description,
     );
-    const response = await requestToSolvanaServices(
-      resultCategory.endpoint,
-      bodyJson,
-    );
+    const resSolvanaApi = await solvanaService(category.endpoint, bodyJson);
+    if (category.responseType === "file") {
+      await handleSendFileFromResponse(resSolvanaApi.data.createdFiles, ctx);
+    }
     const resultAnalize =
-      await askToCategories(`Permintaan dari: ${fullname}, Service yang dijalankan yaitu hit api ${resultCategory.endpoint}, coba simpulkan hasil dari response API ini jika ada kendala coba CC tag @radea_surya
-    ${JSON.stringify(response)}| tidak usah jawab dengan format`);
+      await askToCategories(`Permintaan dari: ${fullname}, Service yang dijalankan yaitu hit api ${category.endpoint}, coba simpulkan hasil dari response API ini jika ada kendala coba CC tag @radea_surya
+    ${JSON.stringify(resSolvanaApi)}| tidak usah jawab dengan format`);
     ctx.reply(resultAnalize.resultMessage, {
       reply_to_message_id: ctx.message.message_id,
     });
   } catch (error) {
-    console.log(error);
-    logger.error(JSON.stringify({ error }));
+    logger.error(error);
   }
 }
 

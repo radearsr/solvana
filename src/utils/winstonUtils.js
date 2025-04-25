@@ -1,36 +1,34 @@
-const winston = require("winston");
-const path = require("path");
+const { createLogger, format, transports } = require("winston");
+const { combine, printf, errors } = format;
 
-const logDir = path.join(__dirname, "../logs");
-require("fs").existsSync(logDir) || require("fs").mkdirSync(logDir);
+function toWIBISOString(date = new Date()) {
+  const offsetMs = 7 * 60 * 60 * 1000; // +7 jam
+  const localDate = new Date(date.getTime() + offsetMs);
+  return localDate.toISOString().replace("T", " ").slice(0, 19);
+}
 
-const logger = winston.createLogger({
-  level: "warn",
-  format: winston.format.combine(
-    winston.format.timestamp({
-      format: "YYYY-MM-DD HH:mm:ss",
-    }),
-    winston.format.printf(
-      (info) => `${info.timestamp} ${info.level}: ${info.message}`,
-    ),
-  ),
+const logFormat = printf(({ level, message, timestamp, stack }) => {
+  const wibTime = toWIBISOString(new Date(timestamp));
+  return `${wibTime} [${level}]: ${stack || message}`;
+});
+
+const logger = createLogger({
+  level: "debug",
+  format: combine(format.timestamp(), errors({ stack: true }), logFormat),
   transports: [
-    new winston.transports.File({
-      filename: path.join(logDir, "error.log"),
-      level: "error",
-    }),
-    new winston.transports.File({
-      filename: path.join(logDir, "combined.log"),
-    }),
+    new transports.File({ filename: "logs/error.log", level: "error" }),
+    new transports.File({ filename: "logs/combined.log" }),
   ],
 });
 
 if (process.env.NODE_ENV !== "production") {
   logger.add(
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple(),
+    new transports.Console({
+      format: combine(
+        format.colorize(),
+        format.timestamp(),
+        errors({ stack: true }),
+        logFormat,
       ),
     }),
   );
