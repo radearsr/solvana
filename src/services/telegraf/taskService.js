@@ -13,12 +13,6 @@ const {
 } = require("../../utils/telegrafUtils");
 const fileUtils = require("../../utils/fileUtils");
 
-const chatMessageTitleMap = {
-  "Testing Send BOT NodeJS 2": "UNITEDPAY",
-  "IT-CS UNITEDPAY": "UNITEDPAY",
-  "IT-CS MURAPAY": "MURAPAY",
-};
-
 async function handleSendFileFromResponse(files, ctx) {
   files.forEach((groupVouchers) => {
     groupVouchers.files.forEach(async (voucher) => {
@@ -51,7 +45,6 @@ async function handleMessageGeneralTask(ctx, textMessage) {
     }
     await ctx.sendChatAction("typing");
     const chatGroup = matchesChatTitle(chatTitle);
-    return ctx.reply("PASS");
     const askTemplate = `Dari ${fullname}, Group: ${chatGroup}, Pesan: ${message}`;
     const category = await askToCategories(askTemplate);
     logger.warn(JSON.stringify({ category }));
