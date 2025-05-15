@@ -10,6 +10,7 @@ const {
 const {
   parseCurrentContext,
   matchesChatTitle,
+  parseInstanceUrl,
 } = require("../../utils/telegrafUtils");
 const fileUtils = require("../../utils/fileUtils");
 
@@ -65,7 +66,8 @@ async function handleMessageGeneralTask(ctx, textMessage) {
       category.body,
       category.description,
     );
-    const resSolvanaApi = await solvanaService(category.endpoint, bodyJson);
+    const apiEndpoint = parseInstanceUrl(category.endpoint);
+    const resSolvanaApi = await solvanaService(apiEndpoint, bodyJson);
     if (category.responseType === "file") {
       await handleSendFileFromResponse(resSolvanaApi.data.createdFiles, ctx);
     }

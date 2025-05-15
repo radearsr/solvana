@@ -2,7 +2,7 @@
   {
     "name": "ENABLE_USER_NON_ACTIVE",
     "description": "Permintaan untuk mengaktifkan kembali pengguna yang nonaktif, dan pengguna yang pernah hapus akun",
-    "apiEndpoint": "http://localhost:3000/api/v1/unitedpay/enable-user-nonactive",
+    "apiEndpoint": "{{GENERAL_API_INSTANCE}}/api/v1/unitedpay/enable-user-nonactive",
     "requiredBody": {
       "kode_agen": "string"
     },
@@ -11,7 +11,7 @@
   {
     "name": "OPEN_KYC_IMAGE_UNITEDPAY",
     "description": "Permintaan terkait verifikasi dokumen atau data (KYC) dan aset gambar yang berada dibackoffice (BO) untuk UNITEDPAY dengan kode agen awalan UTD",
-    "apiEndpoint": "http://localhost:3000/api/v1/unitedpay/upload-verification-image",
+    "apiEndpoint": "{{GENERAL_API_INSTANCE}}/api/v1/unitedpay/upload-verification-image",
     "requiredBody": {
       "kode_agen": "string"
     },
@@ -20,7 +20,7 @@
   {
     "name": "CREATE_VOUCHER",
     "description": "Permintaan untuk membuat voucher di MAARI atau BURJO",
-    "apiEndpoint": "http://localhost:3000/api/v1/esb/voucher/excel",
+    "apiEndpoint": "{{GENERAL_API_INSTANCE}}/api/v1/esb/voucher/excel",
     "requiredBody": {
       "vouchersConfig": [
         {
@@ -33,8 +33,8 @@
               "minSalesAmount": "string(isi 0 jika tidak ada perintah)",
               "amount": "string",
               "notes": "string (kesimpulan dari perintah untuk apa voucher ini atau isi dengan nominal dan cabang mana)",
-              "startDate": "string (DD/MM/YYYY)",
-              "endDate": "string (DD/MM/YYYY)"
+              "startDate": "format(DD/MM/YYYY)",
+              "endDate": "format(DD/MM/YYYY)"
             }
           ]
         }
@@ -45,7 +45,7 @@
   {
     "name": "OPEN_KYC_IMAGE_MURAPAY",
     "description": "Permintaan terkait verifikasi dokumen atau data (KYC) dan aset gambar yang berada dibackoffice (BO) untuk MURAPAY dengan kode agen awalan MP",
-    "apiEndpoint": "http://localhost:3000/api/v1/murapay/upload-verification-image",
+    "apiEndpoint": "{{GENERAL_API_INSTANCE}}/api/v1/esb/voucher/excel",
     "requiredBody": {
       "kode_agen": "string"
     },
@@ -54,7 +54,7 @@
   {
     "name": "COMMON_CHAT",
     "description": "Percakapan biasa yang tidak memiliki arti dalam kasus yang diberikan diatas",
-    "apiEndpoint": "http://192.168.0.9:5000/ask",
+    "apiEndpoint": "{{RAG_API_INSTANCE}}/ask",
     "requiredBody": {
       "query": "string"
     },

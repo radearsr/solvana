@@ -1,7 +1,7 @@
 const logger = require("./winstonUtils");
 
 exports.parseCurrentContext = (ctx, textMessage) => {
-  logger.warn(JSON.stringify(ctx.message));
+  logger.warn(JSON.stringify(ctx.message, null, 2));
   const isReply = ctx.message.hasOwnProperty("reply_to_message");
   const replyMessage = isReply ? ctx.message.reply_to_message.text : "";
   const replyFullname = isReply
@@ -47,4 +47,12 @@ exports.matchesChatTitle = (chatTitle) => {
   return chatMessageTitleMap[chatTitle]
     ? chatMessageTitleMap[chatTitle]
     : "Private Chat";
+};
+
+exports.parseInstanceUrl = (templateUrl) => {
+  const envs = {
+    GENERAL_API_INSTANCE: process.env.GENERAL_API_INSTANCE,
+    RAG_API_INSTANCE: process.env.RAG_API_INSTANCE,
+  };
+  return templateUrl.replace(/{{(.*?)}}/g, (_, key) => envs[key] || "");
 };
