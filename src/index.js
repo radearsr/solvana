@@ -3,18 +3,23 @@ const { Telegraf } = require("telegraf");
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const logger = require("./utils/winstonUtils");
 
-const { handleMessageGeneralTask } = require("./services/telegraf/taskService");
+const { handleMessageToTask } = require("./services/telegraf/taskService");
 
 bot.start((ctx) => ctx.reply("Selamat Datang saya Solvana siap membantu anda"));
 
 bot.on("text", async (ctx) => {
   const textMessage = ctx.message.text;
-  await handleMessageGeneralTask(ctx, textMessage);
+  await handleMessageToTask(ctx, textMessage);
 });
 
 bot.on("photo", async (ctx) => {
   const textMessage = ctx.message.caption;
-  await handleMessageGeneralTask(ctx, textMessage);
+  await handleMessageToTask(ctx, textMessage);
+});
+
+bot.on("document", async (ctx) => {
+  const textMessage = ctx.message.caption;
+  await handleMessageToTask(ctx, textMessage);
 });
 
 bot.launch();

@@ -2,6 +2,7 @@ require("dotenv").config();
 const { Groq } = require("groq-sdk");
 const logger = require("../../utils/winstonUtils");
 const fileUtils = require("../../utils/fileUtils");
+const { log } = require("winston");
 
 const client = new Groq({
   apiKey: process.env.GROQ_API_TOKEN,
@@ -29,6 +30,7 @@ async function askToCategories(message) {
   const serviceListMessage = availableService
     .map((service, idx) => `${idx + 1}.${service.name}: ${service.description}`)
     .join("\n");
+  logger.info(JSON.stringify({ serviceListMessage }), null, 2);
   const systemPrompt = `
   Kamu adalah solvana, asisten IT yang ramah dan profesional, dan dibawah ini adalah layanan yang bisa kamu berikan:
   ${serviceListMessage}
@@ -78,16 +80,18 @@ async function askToCategories(message) {
 
 async function askToGenerateJson(message, jsonExpectation, description) {
   logger.info(JSON.stringify({ message, jsonExpectation, description }));
+  const messageTemplate = `
+    dari pesan dibawah ini,
+    ${message}
+    bantu buatkan json datanya, jawab hanya dengan format json saja, tidak usah memberikan penjelasan apapun, ini untuk struktur jsonnya, dan ini adalah informasi tambahan ${description}
+    ${JSON.stringify(jsonExpectation)}
+  `;
+  console.log({ messageTemplate });
   const chatCompletion = await client.chat.completions.create({
     messages: [
       {
         role: "user",
-        content: `
-        dari pesan dibawah ini,
-        ${message}
-        bantu buatkan json datanya, jawab hanya dengan format json saja, tidak usah memberikan penjelasan apapun, ini untuk struktur jsonnya, dan ini adalah informasi tambahan ${description}
-        ${JSON.stringify(jsonExpectation)}
-        `,
+        content: messageTemplate,
       },
     ],
     model: "llama-3.3-70b-versatile",

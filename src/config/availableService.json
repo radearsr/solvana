@@ -52,6 +52,17 @@
     "responseType": "text"
   },
   {
+    "name": "UPLOAD_VOUCHER",
+    "description": "Permintaan untuk mengupload voucher di MAARI atau BURJO",
+    "apiEndpoint": "{{PUPPTEER_API_ENDPOINT}}/api/v1/esb/voucher/telegram",
+    "requiredBody": {
+      "file_id": "string dari file_id telegram)",
+      "branch_code": "BRJO untuk burjo, MAARI untuk maari (pilih 1 saja)",
+      "mode": "string (pilih 1 saja) [CREATE, EXTENSION, ACTIVATE]"
+    },
+    "responseType": "file"
+  },
+  {
     "name": "COMMON_CHAT",
     "description": "Percakapan biasa yang tidak memiliki arti dalam kasus yang diberikan diatas",
     "apiEndpoint": "{{RAG_API_INSTANCE}}/ask",

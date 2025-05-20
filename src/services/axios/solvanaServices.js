@@ -25,3 +25,15 @@ exports.requestDownloadFile = async (filePath) => {
     console.error("Download failed:", error.message);
   }
 };
+
+exports.requestDownloadFileFromUrl = async (url) => {
+  try {
+    console.log(`Downloading from: ${url}`);
+    const response = await axios.get(url, {
+      responseType: "stream",
+    });
+    return utils.saveFileFromResponse(response, url);
+  } catch (error) {
+    console.error("Download failed:", error.message);
+  }
+};
