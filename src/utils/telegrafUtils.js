@@ -4,7 +4,7 @@ exports.parseCurrentContext = (ctx, textMessage) => {
   logger.warn(JSON.stringify(ctx.message, null, 2));
   const isReply = !!ctx.message.reply_to_message;
   const message = isReply
-    ? ctx.message.reply_to_message?.text || ""
+    ? ctx.message.reply_to_message?.text || ctx.message?.text
     : textMessage;
   const replyFullname = isReply
     ? `${ctx.message.reply_to_message.from.first_name || ""} ${ctx.message.reply_to_message.from.last_name || ""}`.trim()

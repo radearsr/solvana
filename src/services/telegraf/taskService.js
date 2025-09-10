@@ -47,6 +47,7 @@ async function handleMessageToTask(ctx, textMessage) {
 
 async function handleGeneralTask(ctx, { chatTitle, fullname, message }) {
   try {
+    await ctx.sendChatAction("typing");
     logger.debug("handleGeneralTask");
     const chatGroup = matchesChatTitle(chatTitle);
     const askTemplate = `Dari ${fullname}, Group: ${chatGroup}, Pesan: ${message}`;
@@ -55,15 +56,10 @@ async function handleGeneralTask(ctx, { chatTitle, fullname, message }) {
     ctx.reply(category.resultMessage, {
       reply_to_message_id: ctx.message.message_id,
     });
-    await ctx.sendChatAction("typing");
     if (category.categoryName.includes("COMMON_CHAT")) {
-      return handleRagKnowledge(ctx, {
-        chatTitle,
-        fullname,
-        message,
-        category,
-      });
+      return;
     }
+    await ctx.sendChatAction("typing");
     const bodyJson = await askToGenerateJson(
       message,
       category.body,

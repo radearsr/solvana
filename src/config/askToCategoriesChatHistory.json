@@ -1,10 +1,50 @@
 [
   {
     "role": "user",
-    "content": "Dari nodersrbot, Pesan: , Detail File Telegram: {\"file_name\":\"MAARI[S]20250519_191545.xlsx\",\"mime_type\":\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\",\"file_id\":\"BQACAgUAAx0EZc9W4gACBBdoKyDx6Qwywi9dmdpJzJiRU1Na_gAC8hYAApqXWFXLc7ZBp-AjbjYE\",\"file_unique_id\":\"AgAD8hYAApqXWFU\",\"file_size\":20480}"
+    "content": "Dari nodersrbot, Pesan: bantu upload voucher ini untuk MAARI dengan mode create ya, Detail File Telegram: {\"file_name\":\"MAARI[S]20250523_170219.xlsx\",\"mime_type\":\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\",\"file_id\":\"BQACAgUAAxkDAAIVoWgwR6yT7KVtZs-Pyqueam5_TOW5AAIpFQACfvCBVT4bUfEXiqX8NgQ\",\"file_unique_id\":\"AgADKRUAAn7wgVU\",\"file_size\":21853}"
   },
   {
     "role": "assistant",
-    "content": "Selamat pagi! 🌞 SERVICES UPLOAD_VOUCHER"
+    "content": "Selamat siang! 🌞 SERVICES UPLOAD_VOUCHER"
+  },
+  {
+    "role": "user",
+    "content": "Dari nodersrbot, Pesan: bantu upload voucher ini untuk MAARI dengan mode activate ya, Detail File Telegram: {\"file_name\":\"MAARI[S]20250523_170219[S]_Activate.xlsx\",\"mime_type\":\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\",\"file_id\":\"BQACAgUAAxkDAAIVomgwR6yeR_uZvXzWOHThjWDSct_pAAIqFQACfvCBVVlI4zJua8uaNgQ\",\"file_unique_id\":\"AgADKhUAAn7wgVU\",\"file_size\":22504}"
+  },
+  {
+    "role": "assistant",
+    "content": "Selamat siang! 🌞 SERVICES UPLOAD_VOUCHER"
+  },
+  {
+    "role": "user",
+    "content": "Dari Radea Surya Ramandhita, Group: Private Chat, Pesan: hai apa yang bisa kamu lakukan"
+  },
+  {
+    "role": "assistant",
+    "content": "Halo! 🌞 Saya dapat membantu Anda dengan beberapa layanan, seperti mengaktifkan pengguna nonaktif, membuat voucher, mengupload voucher, dan lain-lain. Jika Anda ingin tahu lebih detail, saya bisa menjelaskan layanan-layanan yang saya tawarkan. SERVICES COMMON_CHAT"
+  },
+  {
+    "role": "user",
+    "content": "Dari Radea Surya Ramandhita, Group: Private Chat, Pesan: hai apa yang bisa kamu lakukan"
+  },
+  {
+    "role": "assistant",
+    "content": "Halo! 👋 Saya dapat membantu Anda dengan beberapa layanan, antara lain: \n1. Mengaktifkan kembali pengguna yang nonaktif atau pernah hapus akun\n2. Membuat voucher di MAARI atau BURJO\n3. Mengupload voucher di MAARI atau BURJO\n4. Verifikasi dokumen atau data (KYC) dan aset gambar untuk UNITEDPAY dan MURAPAY\nJika Anda membutuhkan bantuan dengan salah satu layanan tersebut, jangan ragu untuk meminta. SERVICES COMMON_CHAT"
+  },
+  {
+    "role": "user",
+    "content": "Dari Radea Surya Ramandhita, Group: Private Chat, Pesan: hai apa yang bisa kamu lakukan?"
+  },
+  {
+    "role": "assistant",
+    "content": "Halo! Saya dapat membantu Anda dengan beberapa layanan, seperti: \n1. ENABLE_USER_NON_ACTIVE: Mengaktifkan pengguna nonaktif\n2. OPEN_KYC_IMAGE_UNITEDPAY: Verifikasi dokumen untuk UNITEDPAY\n3. CREATE_VOUCHER: Membuat voucher di MAARI atau BURJO\n4. OPEN_KYC_IMAGE_MURAPAY: Verifikasi dokumen untuk MURAPAY\n5. UPLOAD_VOUCHER: Mengupload voucher di MAARI atau BURJO\nJika Anda membutuhkan bantuan, silakan bertanya. SERVICES COMMON_CHAT"
+  },
+  {
+    "role": "user",
+    "content": "Dari Radea Surya Ramandhita, Group: Private Chat, Pesan: hai apa yang bisa kamu lakukan?"
+  },
+  {
+    "role": "assistant",
+    "content": "Saya dapat membantu Anda dengan beberapa layanan, antara lain: \n1. Mengaktifkan pengguna nonaktif \n2. Membuat dan mengupload voucher di MAARI atau BURJO \n3. Verifikasi dokumen untuk UNITEDPAY dan MURAPAY \nJika Anda memerlukan bantuan, saya siap membantu. SERVICES COMMON_CHAT"
   }
 ]

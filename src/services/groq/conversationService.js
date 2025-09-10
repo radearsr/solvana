@@ -2,7 +2,6 @@ require("dotenv").config();
 const { Groq } = require("groq-sdk");
 const logger = require("../../utils/winstonUtils");
 const fileUtils = require("../../utils/fileUtils");
-const { log } = require("winston");
 
 const client = new Groq({
   apiKey: process.env.GROQ_API_TOKEN,
@@ -45,7 +44,7 @@ async function askToCategories(message) {
       { role: "system", content: systemPrompt },
       ...askToCategoriesChatHistory,
     ],
-    model: "llama3-70b-8192",
+    model: "llama-3.3-70b-versatile",
     temperature: 1,
   });
   askToCategoriesChatHistory.push(chatCompletion.choices[0].message);
